@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Musiqa</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{--bg:#08060F;--card:rgba(26,20,48,.74);--ink:#F4F1FF;--mute:#A59CC4;--line:rgba(176,160,255,.15);--pink:#FF3D81;--violet:#7C5CFF;--cyan:#22D3EE;--amber:#FFB020;--field:rgba(255,255,255,.07);--pos:#3ED598;--neg:#FF6B6B;--grad:linear-gradient(135deg,#FF3D81,#7C5CFF)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{padding:calc(14px + var(--tg-content-safe-area-inset-top,0px)) 16px calc(170px + env(safe-area-inset-bottom));min-height:100vh;
+  background:radial-gradient(100% 40% at 0% 0%,rgba(124,92,255,.35),transparent 65%),radial-gradient(90% 40% at 100% 30%,rgba(255,61,129,.2),transparent 65%),var(--bg);background-attachment:fixed}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+h2{font-size:18px;margin:22px 0 10px}
+.mute{color:var(--mute);font-size:14px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:36px}
+.top b{font-size:17px}
+.badge{font-size:12px;font-weight:700;border-radius:999px;padding:5px 10px;background:var(--field);border:1px solid var(--line)}
+.badge.prem{background:var(--grad);border:0;color:#fff}
+.badge.off{color:var(--amber)}
+
+/* to'lqin — asosiy e'tibor markazi */
+.orb{position:relative;margin-top:12px;height:250px;border-radius:30px;overflow:hidden;background:#0B0818;border:1px solid var(--line);isolation:isolate}
+.blob{position:absolute;border-radius:50%;filter:blur(34px);opacity:.9;animation:drift 9s ease-in-out infinite alternate;z-index:-1}
+.b1{width:190px;height:190px;left:-30px;top:-20px;background:var(--pink)}
+.b2{width:210px;height:210px;right:-50px;top:10px;background:var(--violet);animation-delay:-3s}
+.b3{width:150px;height:150px;left:90px;bottom:-40px;background:var(--cyan);animation-delay:-6s;opacity:.7}
+.b4{width:90px;height:90px;right:60px;bottom:30px;background:var(--amber);animation-delay:-2s;opacity:.6}
+@keyframes drift{to{transform:translate(26px,-18px) scale(1.18)}}
+.orb .go{position:absolute;left:0;right:0;top:34px;margin:auto;width:max-content;border:0;background:none;display:flex;align-items:center;gap:10px;font-size:30px;font-weight:800;letter-spacing:-.5px;text-shadow:0 2px 20px rgba(0,0,0,.4)}
+.orb .go svg{width:30px;height:30px;fill:#fff}
+.orb .sel{position:absolute;left:14px;right:14px;bottom:14px;display:flex;gap:10px}
+.fbtn,.fpill{border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.16);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:999px;height:48px}
+.fbtn{width:56px;display:grid;place-items:center}
+.fbtn svg{width:22px;height:22px;stroke:#fff;stroke-width:2.2;fill:none;stroke-linecap:round}
+.fpill{flex:1;font-weight:600;padding:0 16px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.search{margin-top:14px;display:flex;align-items:center;gap:10px;background:var(--field);border:1px solid var(--line);border-radius:14px;padding:0 12px}
+.search svg{width:20px;height:20px;stroke:var(--mute);fill:none;stroke-width:2;stroke-linecap:round;flex:none}
+.search input{flex:1;background:none;border:0;color:var(--ink);font:inherit;padding:13px 0;min-width:0}
+.search input:focus-visible{outline:none}.search:focus-within{border-color:var(--violet)}
+
+.trk{display:flex;align-items:center;gap:12px;padding:8px 6px;border-radius:14px}
+.trk:active{background:var(--field)}
+.trk.now .t{color:var(--pink)}
+.cv{width:50px;height:50px;border-radius:12px;flex:none;background:var(--grad) center/cover no-repeat;display:grid;place-items:center;font-size:20px}
+.trk .m{flex:1;min-width:0}
+.trk .t{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trk .a{color:var(--mute);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ib{border:0;background:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;flex:none}
+.ib svg{width:23px;height:23px;fill:none;stroke:var(--mute);stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.ib.on svg{fill:var(--pink);stroke:var(--pink)}
+.ib.lock{opacity:.35}
+.empty{text-align:center;color:var(--mute);padding:30px 10px}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:12px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.av{width:52px;height:52px;border-radius:50%;background:var(--grad);display:grid;place-items:center;font-size:22px;font-weight:800;flex:none}
+.plans{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.plan{position:relative;text-align:left;border:1px solid var(--line);background:var(--card);border-radius:18px;padding:14px 12px}
+.plan b{display:block;font-size:20px;margin:6px 0 2px}
+.plan .d{position:absolute;right:10px;top:10px;background:var(--pink);color:#fff;font-size:12px;font-weight:700;border-radius:8px;padding:2px 7px}
+.plan.best{border-color:var(--violet);box-shadow:0 0 0 1px var(--violet) inset}
+.perk{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}.perk:last-child{border:0}
+.btn{width:100%;margin-top:12px;border:0;border-radius:14px;padding:14px;font-weight:700;background:var(--grad);color:#fff}
+.btn.alt{background:var(--field);border:1px solid var(--line)}
+.btn:disabled{opacity:.5}
+input[type=file],.inp{width:100%;font:inherit;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:12px;padding:12px}
+.copy{display:flex;align-items:center;gap:8px;background:var(--field);border:1px dashed var(--mute);border-radius:12px;padding:11px 12px;margin:8px 0}
+.copy button{margin-left:auto;border:0;background:var(--violet);border-radius:8px;padding:7px 11px;color:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--field);border-radius:999px;padding:10px 14px;font-size:15px}
+.chip[aria-pressed="true"]{background:var(--grad);border-color:transparent;color:#fff;font-weight:600}
+
+/* pastki qismlar */
+nav{position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:5;display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:6px;border-radius:32px;
+  background:rgba(24,18,46,.66);border:1px solid var(--line);box-shadow:0 10px 32px rgba(0,0,0,.45);backdrop-filter:blur(22px) saturate(1.6);-webkit-backdrop-filter:blur(22px) saturate(1.6)}
+nav button{background:none;border:0;color:var(--mute);padding:8px 2px 7px;border-radius:26px;font-size:12px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:3px}
+nav svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav button[aria-selected="true"]{color:#fff;background:rgba(124,92,255,.32)}
+#mini{position:fixed;left:12px;right:12px;bottom:calc(88px + env(safe-area-inset-bottom));z-index:5;display:none;align-items:center;gap:10px;padding:8px 10px 10px;border-radius:20px;
+  background:rgba(34,26,66,.86);border:1px solid var(--line);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);overflow:hidden}
+#mini .cv{width:42px;height:42px;border-radius:10px}
+#mini .bar{position:absolute;left:0;bottom:0;height:3px;background:var(--grad);width:0}
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10;display:flex;align-items:flex-end}
+.sheet{background:#130F26;width:100%;border-radius:24px 24px 0 0;padding:18px 16px calc(20px + env(safe-area-inset-bottom));max-height:92vh;overflow:auto;border-top:1px solid var(--line)}
+.sheet h3{margin:0 0 12px;font-size:19px}.sheet .g{margin:14px 0 8px;color:var(--mute);font-size:14px}
+.big{width:min(72vw,300px);aspect-ratio:1;border-radius:26px;margin:6px auto 16px;background:var(--grad) center/cover no-repeat;display:grid;place-items:center;font-size:70px;box-shadow:0 18px 50px rgba(124,92,255,.4)}
+input[type=range]{width:100%;accent-color:var(--pink);margin:0}
+.ctl{display:flex;justify-content:center;align-items:center;gap:22px;margin-top:8px}
+.ctl .ib{width:52px;height:52px}.ctl .ib svg{width:30px;height:30px;stroke:#fff;fill:#fff}
+.ctl .pp{width:70px;height:70px;background:var(--grad)}.ctl .pp svg{width:32px;height:32px}
+#toast{position:fixed;left:16px;right:16px;bottom:calc(150px + env(safe-area-inset-bottom));background:#fff;color:#14102a;padding:12px 14px;border-radius:14px;z-index:30;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none;font-weight:600}
+#toast.show{opacity:1;transform:none}#toast.err{background:var(--neg);color:#fff}
+.spin{text-align:center;padding:60px;color:var(--mute)}
+@media (prefers-reduced-motion:reduce){.blob{animation:none}*{transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"><div class="spin">Yuklanmoqda…</div></div>
+<div id="mini" role="region" aria-label="Pleyer"></div>
+<nav id="tabs" hidden>
+  <button data-t="home"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Uy</button>
+  <button data-t="liked"><svg viewBox="0 0 24 24"><path d="M12 20.5s-7.5-4.6-9-9.5A5 5 0 0 1 12 7.6 5 5 0 0 1 21 11c-1.5 4.9-9 9.5-9 9.5z"/></svg>Saralangan</button>
+  <button data-t="premium"><svg viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20M9 3l3 6 3-6M12 21 9 9M12 21l3-12"/></svg>Premium</button>
+</nav>
+<div id="toast" role="status"></div>
+<script>
+const tg = window.Telegram && Telegram.WebApp;
+if (tg) { try { tg.ready(); tg.expand(); } catch (e) {} }
+const INIT = tg ? tg.initData : "";
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = n => Number(n).toLocaleString("ru-RU").replace(/ /g, " ");
+const mmss = s => { s = Math.max(0, Math.floor(s || 0)); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); };
+const IC = {
+  play: '<svg viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z"/></svg>', pause: '<svg viewBox="0 0 24 24"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>',
+  next: '<svg viewBox="0 0 24 24"><path d="M5 5v14l10-7zM17 5h2v14h-2z"/></svg>', prev: '<svg viewBox="0 0 24 24"><path d="M19 5v14L9 12zM5 5h2v14H5z"/></svg>',
+  heart: '<svg viewBox="0 0 24 24"><path d="M12 20.5s-7.5-4.6-9-9.5A5 5 0 0 1 12 7.6 5 5 0 0 1 21 11c-1.5 4.9-9 9.5-9 9.5z"/></svg>',
+  dl: '<svg viewBox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg>'
+};
+const S = { me: null, tab: new URLSearchParams(location.search).get("tab") === "premium" ? "premium" : "home", feat: [], res: null, liked: [],
+  queue: [], qi: -1, wave: false, filter: { mood: "", rhythm: "" }, seen: [], fatal: null };
+const au = new Audio(); au.preload = "auto";
+
+async function api(path, opts = {}) {
+  const h = Object.assign({ "X-Init-Data": INIT }, opts.headers || {});
+  let body = opts.body;
+  if (body && !(body instanceof FormData)) { h["Content-Type"] = "application/json"; body = JSON.stringify(body); }
+  let r; try { r = await fetch(path, { method: opts.method || "GET", headers: h, body }); } catch (e) { throw new Error("Internet aloqasi yo'q. Qayta urinib ko'ring"); }
+  let j = null; try { j = await r.json(); } catch (e) {}
+  if (!r.ok) throw new Error(j && typeof j.detail === "string" ? j.detail : "Server javob bermadi, birozdan so'ng urinib ko'ring");
+  return j;
+}
+let tt;
+function toast(m, err) { const t = $("#toast"); t.textContent = m; t.className = "show" + (err ? " err" : ""); clearTimeout(tt); tt = setTimeout(() => t.className = "", 3200);
+  try { tg && tg.HapticFeedback && tg.HapticFeedback.notificationOccurred(err ? "error" : "success"); } catch (e) {} }
+
+async function load(all) {
+  try {
+    S.me = await api("/api/me"); S.fatal = null;
+    if (all || S.tab === "home") S.feat = await api("/api/tracks?featured=1");
+    if (all || S.tab === "liked") S.liked = await api("/api/liked");
+  } catch (e) { if (!S.me) S.fatal = e.message; else if (all) toast(e.message, true); }
+  if (!typing()) render();
+}
+const typing = () => { const a = document.activeElement; return a && a.tagName === "INPUT" && a.type !== "range"; };
+
+function render() {
+  const app = $("#app");
+  if (S.fatal) { $("#tabs").hidden = true; app.innerHTML = `<div class="empty"><p>${esc(S.fatal)}</p><button class="btn" id="retry">Qayta urinish</button></div>`; $("#retry").onclick = () => load(true); return; }
+  if (!S.me) return;
+  $("#tabs").hidden = false;
+  document.querySelectorAll("#tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.t === S.tab));
+  const m = S.me, st = m.premium ? `<span class="badge prem">💎 Premium</span>` : m.trial ? `<span class="badge">🎁 Sinov: ${m.days_left} kun</span>` : `<span class="badge off">⏳ Premium kerak</span>`;
+  app.innerHTML = `<div class="top"><b>${esc(m.title)}</b>${st}</div>` + ({ home: vHome, liked: vLiked, premium: vPremium }[S.tab])();
+  bind(); paint();
+}
+
+function cover(t) { return t.cover ? `style="background-image:url('/cover/${t.id}')"` : ""; }
+function trk(t, src, i, extra = "") {
+  return `<div class="trk" data-src="${src}" data-i="${i}" data-id="${t.id}" role="button" tabindex="0"><div class="cv" ${cover(t)}>${t.cover ? "" : "♪"}</div>
+    <div class="m"><div class="t">${esc(t.title)}</div><div class="a">${esc(t.artist || "—")}${t.dur ? " · " + mmss(t.dur) : ""}</div></div>${extra}
+    <button class="ib ${t.liked ? "on" : ""}" data-like="${t.id}" aria-label="Yoqtirish">${IC.heart}</button></div>`;
+}
+const selLabel = () => { const f = S.filter, m = S.me; const a = m.moods.find(x => x.k === f.mood), b = m.rhythms.find(x => x.k === f.rhythm);
+  return (a || b) ? [a && a.t, b && b.t].filter(Boolean).join(" · ") : "Hammasi aralash"; };
+
+function vHome() {
+  const list = S.res || S.feat;
+  const rows = list.length ? list.map((t, i) => trk(t, S.res ? "res" : "feat", i)).join("") : `<div class="empty">${S.res ? "Hech narsa topilmadi. Boshqa nom yozing." : "Hali musiqa qo'shilmagan."}</div>`;
+  return `<section class="orb"><i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i><i class="blob b4"></i>
+    <button class="go" id="wave">${IC.play}To'lqin</button>
+    <div class="sel"><button class="fbtn" id="filt" aria-label="Kayfiyat va ritm"><svg viewBox="0 0 24 24"><path d="M4 7h16M7 12h10M10 17h4"/></svg></button><button class="fpill" id="filt2">${esc(selLabel())}</button></div></section>
+    <label class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" placeholder="Musiqa nomi yoki ijrochi" value="${esc(S.q || "")}" autocomplete="off"></label>
+    <h2>${S.res ? "Natijalar" : "Tavsiya"}</h2><div id="list">${rows}</div>`;
+}
+function vLiked() {
+  const dl = !!S.me.premium;
+  const rows = S.liked.length ? S.liked.map((t, i) => trk(t, "liked", i, `<button class="ib ${dl ? "" : "lock"}" data-dl="${t.id}" aria-label="Yuklab olish">${IC.dl}</button>`)).join("")
+    : `<div class="empty">Hali saralangan musiqa yo'q.<br>Musiqadagi ❤️ ni bosing.</div>`;
+  return `<h2>Saralangan musiqalar</h2>${dl ? "" : `<div class="card mute">Yuklab olish tugmasi faqat 💎 Premium egalarida ishlaydi.</div>`}${rows}`;
+}
+function vPremium() {
+  const m = S.me, ini = (m.name || "?")[0].toUpperCase();
+  const stat = m.premium ? `💎 Premium faol — <b>${esc(m.premium_until)}</b> gacha (${m.days_left} kun)` : m.trial ? `🎁 Bepul sinov — <b>${m.days_left} kun</b> qoldi` : `⏳ Bepul sinov tugagan, Premium yo'q`;
+  const pl = m.plans.map(p => `<button class="plan ${p.months === 12 ? "best" : ""}" data-plan="${p.months}">${p.disc ? `<span class="d">−${p.disc}%</span>` : ""}<span class="mute">${p.months === 12 ? "1 yil" : p.months + " oy"}</span>
+    <b class="num">${fmt(p.price)} so'm</b><span class="mute">yoki ${p.stars} ⭐</span></button>`).join("");
+  return `<h2>Mening profilim</h2><div class="card"><div class="row" style="justify-content:flex-start;gap:14px"><div class="av">${esc(ini)}</div>
+    <div><b>${esc(m.name || "—")}</b>${m.username ? ` <span class="mute">@${esc(m.username)}</span>` : ""}<div class="mute">${esc(m.phone || "")}</div></div></div>
+    <div style="margin-top:12px">${stat}</div></div>
+    <h2>Premium sotib olish</h2><div class="plans">${pl}</div>
+    <h2>Premium bilan</h2><div class="card"><div class="perk"><span>♾️</span><div>Musiqalarni cheksiz tinglash</div></div><div class="perk"><span>⬇️</span><div>Yoqqan musiqani botga yuklab olish</div></div>
+    <div class="perk"><span>💾</span><div>Saqlangan musiqa menyusi botda</div></div><div class="perk"><span>🎚️</span><div>Kayfiyat va ritmga mos to'lqin</div></div></div>`;
+}
+
+function bind() {
+  const app = $("#app");
+  app.querySelectorAll(".trk").forEach(r => { const go = () => playList(src(r.dataset.src), +r.dataset.i); r.onclick = e => { if (!e.target.closest("button")) go(); }; r.onkeydown = e => { if (e.key === "Enter") go(); }; });
+  app.querySelectorAll("[data-like]").forEach(b => b.onclick = e => { e.stopPropagation(); like(+b.dataset.like); });
+  app.querySelectorAll("[data-dl]").forEach(b => b.onclick = e => { e.stopPropagation(); download(+b.dataset.dl); });
+  app.querySelectorAll("[data-plan]").forEach(b => b.onclick = () => payChoose(+b.dataset.plan));
+  const w = $("#wave"); if (w) w.onclick = startWave;
+  ["#filt", "#filt2"].forEach(s => { const e = $(s); if (e) e.onclick = openFilter; });
+  const q = $("#q"); if (q) { let t; q.oninput = () => { S.q = q.value; clearTimeout(t); t = setTimeout(search, 350); }; }
+}
+const src = k => ({ feat: S.feat, res: S.res || [], liked: S.liked }[k]);
+async function search() {
+  const q = (S.q || "").trim();
+  try { S.res = q ? await api("/api/tracks?q=" + encodeURIComponent(q)) : null; } catch (e) { return toast(e.message, true); }
+  const l = $("#list"); if (!l) return;
+  const list = S.res || S.feat; $("#app h2").textContent = S.res ? "Natijalar" : "Tavsiya";
+  l.innerHTML = list.length ? list.map((t, i) => trk(t, S.res ? "res" : "feat", i)).join("") : `<div class="empty">Hech narsa topilmadi. Boshqa nom yozing.</div>`;
+  const keep = $("#q"); l.querySelectorAll(".trk").forEach(r => r.onclick = e => { if (!e.target.closest("button")) playList(src(r.dataset.src), +r.dataset.i); });
+  l.querySelectorAll("[data-like]").forEach(b => b.onclick = e => { e.stopPropagation(); like(+b.dataset.like); }); paint();
+}
+
+/* ---------------- pleyer ---------------- */
+function guard() {
+  if (S.me.access) return true;
+  toast("Bepul sinov tugagan. Davom etish uchun Premium oling 💎", true); S.tab = "premium"; render(); return false;
+}
+function playList(list, i) { if (!guard()) return; S.queue = list.slice(); S.qi = i; S.wave = false; playCur(); }
+async function startWave() {
+  if (!guard()) return;
+  try { S.seen = []; const l = await api(`/api/wave?mood=${S.filter.mood}&rhythm=${S.filter.rhythm}`); if (!l.length) return toast("Hali musiqa qo'shilmagan", true);
+    S.queue = l; S.qi = 0; S.wave = true; playCur(); } catch (e) { toast(e.message, true); }
+}
+async function more() {
+  try { const l = await api(`/api/wave?mood=${S.filter.mood}&rhythm=${S.filter.rhythm}&exclude=${S.seen.join(",")}`);
+    const ids = new Set(S.queue.map(t => t.id)); S.queue.push(...l.filter(t => !ids.has(t.id))); } catch (e) {}
+}
+function cur() { return S.queue[S.qi]; }
+function playCur() {
+  const t = cur(); if (!t) return;
+  au.src = `/audio/${t.id}?t=${encodeURIComponent(S.me.token)}`;
+  au.play().catch(() => toast("Musiqani ochib bo'lmadi. Premium muddatini tekshiring", true));
+  if (!S.seen.includes(t.id)) S.seen.push(t.id);
+  if (S.wave && S.queue.length - S.qi < 4) more();
+  try { if ("mediaSession" in navigator) navigator.mediaSession.metadata = new MediaMetadata({ title: t.title, artist: t.artist || "" }); } catch (e) {}
+  paint();
+}
+function next() { if (S.qi + 1 < S.queue.length) { S.qi++; playCur(); } else if (S.wave) { more().then(() => { if (S.qi + 1 < S.queue.length) { S.qi++; playCur(); } }); } else { au.pause(); } }
+function prev() { if (au.currentTime > 4 || S.qi === 0) { au.currentTime = 0; } else { S.qi--; playCur(); } }
+function toggle() { au.paused ? au.play().catch(() => {}) : au.pause(); }
+au.onended = next; au.onplay = au.onpause = () => paint(); au.onerror = () => { if (cur()) toast("Musiqani yuklab bo'lmadi", true); };
+au.ontimeupdate = () => { const d = au.duration || (cur() && cur().dur) || 0, p = d ? au.currentTime / d * 100 : 0;
+  const b = $("#mini .bar"); if (b) b.style.width = p + "%"; const r = $("#seek"); if (r && !r.dragging) { r.value = p * 10; r.style.setProperty("--p", p + "%"); const e = $("#tcur"); if (e) e.textContent = mmss(au.currentTime); const f = $("#tall"); if (f) f.textContent = mmss(d); } };
+try { navigator.mediaSession.setActionHandler("nexttrack", next); navigator.mediaSession.setActionHandler("previoustrack", prev); } catch (e) {}
+
+function paint() {
+  const t = cur(), mini = $("#mini");
+  document.querySelectorAll(".trk").forEach(r => r.classList.toggle("now", !!t && +r.dataset.id === t.id));
+  if (!t) { mini.style.display = "none"; return; }
+  mini.style.display = "flex";
+  mini.innerHTML = `<div class="cv" ${cover(t)} id="open" role="button" tabindex="0">${t.cover ? "" : "♪"}</div><div class="m" id="open2" style="flex:1;min-width:0"><div class="t" style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(t.title)}</div><div class="mute" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(t.artist || "—")}</div></div>
+    <button class="ib" id="mpp" aria-label="Play/Pause"><span style="display:contents">${au.paused ? IC.play : IC.pause}</span></button><button class="ib" id="mnx" aria-label="Keyingisi">${IC.next}</button><i class="bar"></i>`;
+  mini.querySelectorAll("svg").forEach(s => { s.style.fill = "#fff"; s.style.stroke = "none"; });
+  $("#open").onclick = $("#open2").onclick = openFull; $("#mpp").onclick = toggle; $("#mnx").onclick = next;
+  const fp = $("#fpp"); if (fp) fp.innerHTML = au.paused ? IC.play : IC.pause;
+}
+function openFull() {
+  const t = cur(); if (!t) return;
+  const bg = document.createElement("div"); bg.className = "sheet-bg";
+  bg.innerHTML = `<div class="sheet" role="dialog" aria-label="Pleyer"><div class="big" ${cover(t)}>${t.cover ? "" : "♪"}</div>
+    <div class="row"><div style="min-width:0"><h3 style="margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(t.title)}</h3><div class="mute">${esc(t.artist || "—")}</div></div>
+    <button class="ib ${t.liked ? "on" : ""}" data-like="${t.id}" aria-label="Yoqtirish">${IC.heart}</button></div>
+    <div style="margin-top:14px"><input id="seek" type="range" min="0" max="1000" value="0" aria-label="Surish"><div class="row mute"><span id="tcur">0:00</span><span id="tall">${mmss(t.dur)}</span></div></div>
+    <div class="ctl"><button class="ib" id="fpv" aria-label="Oldingisi">${IC.prev}</button><button class="ib pp" id="fpp" aria-label="Play/Pause">${au.paused ? IC.play : IC.pause}</button><button class="ib" id="fnx" aria-label="Keyingisi">${IC.next}</button></div>
+    <button class="btn alt" id="fdl" ${S.me.premium ? "" : 'style="opacity:.45"'}>⬇️ Botga yuklab olish ${S.me.premium ? "" : "(Premium)"}</button></div>`;
+  document.body.appendChild(bg);
+  bg.onclick = e => { if (e.target === bg) bg.remove(); };
+  const r = $("#seek", bg); r.oninput = () => { r.dragging = true; au.currentTime = (au.duration || 0) * r.value / 1000; r.style.setProperty("--p", r.value / 10 + "%"); }; r.onchange = () => r.dragging = false;
+  $("#fpp", bg).onclick = toggle; $("#fnx", bg).onclick = () => { next(); bg.remove(); openFull(); }; $("#fpv", bg).onclick = () => { prev(); bg.remove(); openFull(); };
+  $("#fdl", bg).onclick = () => download(t.id); $("[data-like]", bg).onclick = e => like(+e.currentTarget.dataset.like);
+}
+
+/* ---------------- like / yuklab olish ---------------- */
+async function like(id) {
+  try {
+    const r = await api("/api/like", { method: "POST", body: { track_id: id } });
+    [S.feat, S.res || [], S.liked, S.queue].forEach(l => l.forEach(t => { if (t.id === id) t.liked = r.liked; }));
+    document.querySelectorAll(`[data-like="${id}"]`).forEach(b => b.classList.toggle("on", r.liked));
+    if (S.tab === "liked") { S.liked = await api("/api/liked"); if (!typing()) render(); }
+  } catch (e) { toast(e.message, true); }
+}
+async function download(id) {
+  if (!S.me.premium) return toast("Yuklab olish faqat 💎 Premium egalari uchun", true);
+  try { const r = await api("/api/download", { method: "POST", body: { track_id: id } }); toast(r.msg); } catch (e) { toast(e.message, true); }
+}
+
+/* ---------------- kayfiyat / ritm ---------------- */
+function sheet(html) { const bg = document.createElement("div"); bg.className = "sheet-bg"; bg.innerHTML = `<div class="sheet" role="dialog">${html}</div>`; document.body.appendChild(bg); bg.onclick = e => { if (e.target === bg) bg.remove(); }; return bg; }
+function openFilter() {
+  const m = S.me, chips = (key, arr) => arr.map(x => `<button class="chip" data-f="${key}" data-k="${x.k}" aria-pressed="${S.filter[key] === x.k}">${esc(x.t)}</button>`).join("");
+  const bg = sheet(`<h3>Qanday musiqa tinglaymiz?</h3><div class="g">Kayfiyat</div><div class="chips">${chips("mood", m.moods)}</div><div class="g">Ritm</div><div class="chips">${chips("rhythm", m.rhythms)}</div>
+    <button class="btn" id="fok">▶ Boshlash</button><button class="btn alt" id="fclr">Tozalash</button>`);
+  bg.querySelectorAll("[data-f]").forEach(b => b.onclick = () => { const k = b.dataset.f; S.filter[k] = S.filter[k] === b.dataset.k ? "" : b.dataset.k;
+    bg.querySelectorAll(`[data-f="${k}"]`).forEach(x => x.setAttribute("aria-pressed", S.filter[k] === x.dataset.k)); const p = $("#filt2"); if (p) p.textContent = selLabel(); });
+  $("#fclr", bg).onclick = () => { S.filter = { mood: "", rhythm: "" }; bg.remove(); const p = $("#filt2"); if (p) p.textContent = selLabel(); };
+  $("#fok", bg).onclick = () => { bg.remove(); startWave(); };
+}
+
+/* ---------------- to'lov ---------------- */
+function payChoose(months) {
+  const p = S.me.plans.find(x => x.months === months), nm = months === 12 ? "1 yillik" : months + " oylik";
+  const bg = sheet(`<h3>${nm} Premium</h3><div class="mute">${fmt(p.price)} so'm yoki ${p.stars} ⭐</div>
+    <button class="btn" id="pc">💳 Karta orqali to'lash</button><button class="btn alt" id="ps">⭐ Telegram Stars orqali (${p.stars} ⭐)</button>`);
+  $("#ps", bg).onclick = async () => {
+    try { const r = await api("/api/pay/stars", { method: "POST", body: { months } }); bg.remove();
+      if (tg && tg.openInvoice) tg.openInvoice(r.link, st => { if (st === "paid") { toast("To'lov qabul qilindi ✅"); [1500, 4000, 8000].forEach(d => setTimeout(() => load(false), d)); } else if (st === "failed") toast("To'lov amalga oshmadi", true); });
+      else window.open(r.link, "_blank"); } catch (e) { toast(e.message, true); }
+  };
+  $("#pc", bg).onclick = () => { bg.remove(); cardPay(p); };
+}
+function cardPay(p) {
+  const c = S.me.card;
+  const bg = sheet(`<h3>Karta orqali to'lov</h3><div class="mute">1. Quyidagi kartaga <b>${fmt(p.price)} so'm</b> o'tkazing:</div>
+    <div class="copy"><span>${esc(c.number || "Karta hali kiritilmagan")}</span>${c.number ? `<button id="cp">Nusxa</button>` : ""}</div><div class="mute">Qabul qiluvchi: ${esc(c.owner || "—")}</div>
+    <div class="g">2. To'lov chekini (rasm yoki fayl) yuboring:</div><input id="rf" type="file" accept="image/*,application/pdf"><button class="btn" id="send">Chekni yuborish</button>`);
+  const cp = $("#cp", bg); if (cp) cp.onclick = () => (navigator.clipboard ? navigator.clipboard.writeText(c.number) : Promise.reject()).then(() => toast("Nusxalandi"), () => toast("Qo'lda belgilab nusxalang", true));
+  $("#send", bg).onclick = async e => {
+    const f = $("#rf", bg).files[0]; if (!f) return toast("Avval chekni tanlang", true);
+    e.target.disabled = true; const fd = new FormData(); fd.append("months", p.months); fd.append("file", f);
+    try { const r = await api("/api/pay/card", { method: "POST", body: fd }); bg.remove(); toast(r.msg); } catch (er) { e.target.disabled = false; toast(er.message, true); }
+  };
+}
+
+document.querySelectorAll("#tabs button").forEach(b => b.onclick = () => { S.tab = b.dataset.t; window.scrollTo(0, 0); render(); load(false); });
+setInterval(() => { if (!document.hidden && !document.querySelector(".sheet-bg")) load(false); }, 30000);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) load(false); });
+load(true);
+</script>
+</body>
+</html>
